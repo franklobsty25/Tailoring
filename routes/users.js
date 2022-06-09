@@ -9,13 +9,13 @@ var multer = require('multer');
 var sharp = require('sharp');
 const { promisify } = require('util');
 const { session } = require('passport');
-/*const redis = require('redis');
+const redis = require('redis');
 const { RateLimiterRedis } = require('rate-limiter-flexible');
 const redisClient = redis.createClient({
   enable_offline_queue: true,
-});*/
+});
 
-/*const maxWrongAttemptsByIPperDay =  100;
+const maxWrongAttemptsByIPperDay =  100;
 const maxConsecutiveFailsByUsernameAndIP = 10;
 
 const limiterSlowBruteByIP = new RateLimiterRedis({
@@ -34,7 +34,7 @@ const limiterConsecutiveFailsByUsernameAndIP = new RateLimiterRedis({
   blockDuration: 60 * 60, // Block for 1 hour
 });
 
-const getUsernameIPkey = (username, ip) => `${username}_${ip}`;*/
+const getUsernameIPkey = (username, ip) => `${username}_${ip}`;
 
 
 const storage = multer.memoryStorage();
@@ -104,9 +104,10 @@ router.post('/register', (req, res, next) => {
         }
 
         passport.authenticate('local')(req, res, () => {
+          var token = authenticate.getToken({_id: user._id});
           res.statusCode = 200;
           res.setHeader('Content-Type', 'applicaton/json');
-          res.json({success: true, status: 'Registration successful...'});
+          res.json({success: true, status: 'Registration successful.', access_token: token});
         });
 
       });
@@ -244,7 +245,7 @@ router.post('/forgotpassword', async (req, res, next) => {
       message: `
       You are receiving this because you (or someone else) have requested the reset of the password for your account.
       Please click on the following link, or paste this into your browser to complete the process:
-      http://localhost:3000/reset/${token}
+      http://${req.hostname}/reset/${token}
       If you did not request this, please ignore this email and your password will remain unchanged.
       `,
     };
@@ -274,7 +275,7 @@ router.post('/forgotpassword', async (req, res, next) => {
 
 /* GET reset template */
 router.get('/reset/:token', (req, res) => {
-  res.redirect('https://www.tailoringhub.com/reset-password'); //check reset template from angular
+  res.redirect(`https://${req.hostname}/reset-password`); //check reset template from angular
 });
 
 /* POST reset password */

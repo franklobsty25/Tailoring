@@ -11,6 +11,11 @@ var cors = require('cors');
 var helmet = require('helmet');
 
 const mongoose = require('mongoose');
+const connectionParams = {
+  useNewUrlParser: true,
+  useCreateIndex: true,
+  useUnifiedTopology: true
+}
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -23,25 +28,25 @@ var orderRouter = require('./routes/orders');
 var uploadRouter = require('./routes/uploads');
 var messageRouter = require('./routes/messages');
 
-const connect = mongoose.connect(config.mongoUrl, {useNewUrlParser: true, useUnifiedTopology: true});
-connect.then((db) => {
-  console.log('Server running...');
+mongoose.connect(config.mongoUrl, connectionParams)
+.then(() => {
+  console.log('Connected to the database');
 })
-.catch((error) => {
-  console.log(error);
-})
+.catch((err) => {
+  console.error(`Error connecting to the database: ${err}`);
+});
 
 var app = express();
 
-// Secure traffice only on https:// protocol
-app.all('*', (req, res, next) => {
-  if (req.secure) {
-    return next();
-  }
-  else {
-    res.redirect(307, 'https://' + req.hostname + ':' + app.get('secPort') + req.url);
-  }
-});
+// Secure traffic only on https:// protocol
+// app.all('*', (req, res, next) => {
+//   if (req.secure) {
+//     return next();
+//   }
+//   else {
+//     res.redirect(307, 'https://' + req.hostname + ':' + app.get('secPort') + req.url);
+//   }
+// });
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
