@@ -95,9 +95,11 @@ router.post('/register', async (req, res, next) => {
 
         Tailor.create(req.body).then((tailor) => {
 
+          var token = tailor_auth.getToken({_id: tailor._id});
+
           res.statusCode = 200;
           res.setHeader('Content-Type', 'application/json');
-          res.json({success: true, status: 'Registeration successful.'});
+          res.json({success: true, status: 'Registeration successful.', admin: tailor.admin, access_token: token});
       
         },
         err => next(err))
