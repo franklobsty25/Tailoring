@@ -65,10 +65,18 @@ app.use(passport.session());
 app.use(cors());
 app.use(helmet());
 
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Setting headers to be allowed by client side
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  next();
+});
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-
-app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/customs', customRouter);
 app.use('/measurements', measurementRouter);
